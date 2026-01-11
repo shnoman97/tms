@@ -87,13 +87,13 @@ describe("Token Service", () => {
     test("should return active tokens for user", async () => {
       const response = await getTokens({ userId: "testuser" });
 
-      expect(response.length).toBeGreaterThan(0);
-      expect(response[0].userId).toBe("testuser");
+      expect(response.tokens.length).toBeGreaterThan(0);
+      expect(response.tokens[0].userId).toBe("testuser");
     });
 
     test("should return empty array for user with no tokens", async () => {
       const response = await getTokens({ userId: "nonexistent" });
-      expect(response).toEqual([]);
+      expect(response.tokens).toEqual([]);
     });
 
     test("should reject empty userId", async () => {
@@ -110,8 +110,8 @@ describe("Token Service", () => {
 
       const response = await getTokens({ userId });
       
-      response.forEach(token => {
-        expect(token.expiresAt.getTime()).toBeGreaterThan(Date.now());
+      response.tokens.forEach(token => {
+        expect(new Date(token.expiresAt).getTime()).toBeGreaterThan(Date.now());
       });
     });
   });

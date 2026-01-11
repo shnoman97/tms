@@ -1,9 +1,9 @@
-import { api, APIError, ErrCode } from "encore.dev/api";
+import { api, APIError, ErrCode, Query } from "encore.dev/api";
 import { db } from "./database";
 
 
 interface iGetTokensRequest {
-    userId: string;
+    userId: Query<string>;
 }
 
 interface iCreateTokenRequest {
@@ -82,8 +82,8 @@ export const createToken = api({ expose: true, method: 'POST', path: '/api/token
     });
 
 
-export const getTokens = api({ expose: true, method: 'GET', path: '/api/tokens', auth: true },
-    async (req: iGetTokensRequest) => {
+export const getTokens = api({ expose: true, method: 'GET', path: '/api/tokens' },
+    async (req: iGetTokensRequest): Promise<{ tokens: iGetTokensResponse[] }> => {
         const { userId } = req;
         if (!userId || userId.trim() === "") {
             throw new Error("userId is required");
@@ -92,14 +92,15 @@ export const getTokens = api({ expose: true, method: 'GET', path: '/api/tokens',
         const tokens = await db.queryAll`SELECT * FROM tokens WHERE user_id = ${userId}
                                          AND expires_at > NOW()
                                          ORDER BY created_at DESC`;
-        console.log(tokens);
 
-        return tokens.map((token) => ({
-            "id": token.id,
-            "userId": token.user_id,
-            "scopes": token.scopes,
-            "createdAt": token.created_at,
-            "expiresAt": token.expires_at,
-            "token": token.token
-        }));
+        return {
+            tokens: tokens.map((token) => ({
+                "id": token.id,
+                "userId": token.user_id,
+                "scopes": token.scopes,
+                "createdAt": token.created_at.toISOString(),
+                "expiresAt": token.expires_at.toISOString(),
+                "token": token.token
+            }))
+        };
     });
