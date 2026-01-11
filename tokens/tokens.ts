@@ -1,49 +1,15 @@
-import { api, APIError, ErrCode, Query } from "encore.dev/api";
+import { api, APIError, ErrCode } from "encore.dev/api";
 import { db } from "./database";
+import { iCreateTokenRequest, iGetTokensRequest, iGetTokensResponse } from "./interfaces";
+import { validateCreateToken, validateUserId } from "./validation";
 
-
-interface iGetTokensRequest {
-    userId: Query<string>;
-}
-
-interface iCreateTokenRequest {
-    userId: string;
-    scopes: string[];
-    expiresInMinutes: number;
-}
-
-interface iGetTokensResponse {
-    id: string;
-    userId: string;
-    scopes: string[];
-    createdAt: Date;
-    expiresAt: Date;
-    token: string;
-}
 
 export const createToken = api({ expose: true, method: 'POST', path: '/api/tokens' },
     async (req: iCreateTokenRequest): Promise<iGetTokensResponse> => {
         try {
+            validateCreateToken(req);
+
             const { userId, scopes, expiresInMinutes } = req;
-            if (!userId || userId.trim() === "") {
-                throw APIError.invalidArgument("userId must be a non-empty string");
-            }
-
-            if (!scopes || scopes.length === 0) {
-                throw APIError.invalidArgument("scopes must be a non-empty array");
-            }
-
-            if (scopes.some(scope => !scope || scope.trim() === "")) {
-                throw APIError.invalidArgument("scopes cannot contain empty strings");
-            }
-
-            if (!expiresInMinutes || expiresInMinutes <= 0) {
-                throw APIError.invalidArgument("expiresInMinutes must be a positive integer");
-            }
-
-            if (!Number.isInteger(expiresInMinutes)) {
-                throw APIError.invalidArgument("expiresInMinutes must be an integer");
-            }
             const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
             const tokenValue = crypto.randomUUID();
 
@@ -84,6 +50,8 @@ export const createToken = api({ expose: true, method: 'POST', path: '/api/token
 
 export const getTokens = api({ expose: true, method: 'GET', path: '/api/tokens' },
     async (req: iGetTokensRequest): Promise<{ tokens: iGetTokensResponse[] }> => {
+        validateUserId(req);
+
         const { userId } = req;
         if (!userId || userId.trim() === "") {
             throw new Error("userId is required");
