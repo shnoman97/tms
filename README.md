@@ -1,38 +1,58 @@
-# Empty Encore TS Template
+# Token Management Service - Encore.ts
 
-## Developing locally
+The APIs built with Encore.ts and PostgreSQL.
 
-When you have [installed Encore](https://encore.dev/docs/ts/install), you can create a new Encore application and clone this example with this command.
+## Stack
+
+- **Framework**: Encore.ts
+- **Language**: TypeScript (strict mode)
+- **Database**: PostgreSQL with SQLDatabase ussing docker
+- **Testing**: Vitest - Encore's recommended testing framework
+
+## Features
+
+- ✅ Create access tokens with scopes and expiry
+- ✅ List non-expired tokens for a user
+- ✅ Full TypeScript type safety
+- ✅ Built-in input validation
+- ✅ Database migrations with Encore
+- ✅ Automatic API documentation
+- ✅ Unit tests
+
+## Getting Started
+
+### Install Encore CLI
 
 ```bash
-encore app create my-app-name --example=ts/empty
+# macOS
+brew install encoredev/tap/encore
+
+# Linux
+curl -L https://encore.dev/install.sh | bash
+
+# Windows
+iwr https://encore.dev/install.ps1 | iex
 ```
 
-## Running locally
+### Run the Application
+
 ```bash
+# Clone the repository
+git clone 
+cd token-management-service
+
+# Install dependencies
+npm install
+
+# Run the application (Encore handles database setup automatically)
 encore run
+
+# The application will be available at http://localhost:4000
+# API Explorer: http://localhost:9400
 ```
 
-While `encore run` is running, open <http://localhost:9400/> to view Encore's [local developer dashboard](https://encore.dev/docs/ts/observability/dev-dash).
-
-## Deployment
-
-Deploy your application to a staging environment in Encore's free development cloud:
+## Running Tests
 
 ```bash
-git add -A .
-git commit -m 'Commit message'
-git push encore
-```
-
-Then head over to the [Cloud Dashboard](https://app.encore.dev) to monitor your deployment and find your production URL.
-
-From there you can also connect your own AWS or GCP account to use for deployment.
-
-Now off you go into the clouds!
-
-## Testing
-
-```bash
+# Run all tests
 encore test
-```
